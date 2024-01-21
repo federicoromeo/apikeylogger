@@ -11,7 +11,6 @@ def decorate_openai():
     try:
         
         import openai
-        #from openai import OpenAI
         
         # Force OpenAI to track the tokens usage separately for each key
         original_init = openai.OpenAI.__init__

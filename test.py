@@ -1,8 +1,8 @@
 from openai import OpenAI #import openai
 from dotenv import load_dotenv
-import keylogger
+import apikeylogger
 
-keylogger.decorate_openai()
+apikeylogger.decorate_openai()
 
 load_dotenv()
 
