@@ -2,3 +2,4 @@
 .env
 logs.json
 apikeylogger/prices.json
+tests/test.py
