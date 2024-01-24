@@ -24,10 +24,10 @@ def assert_logs_update(OPENAI_ORG_ID, OPENAI_API_KEY, model, prompt_tokens, comp
     assert previous_prompt_tokens + prompt_tokens == new_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['prompt_tokens']
     assert previous_completion_tokens + completion_tokens == new_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['completion_tokens']
     
-    print(previous_prompt_tokens)
-    print(prompt_tokens)
-    print(new_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['prompt_tokens'])
-    print()
-    print(previous_completion_tokens)
-    print(completion_tokens)
-    print(new_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['completion_tokens'])
+    #print(previous_prompt_tokens)
+    #print(prompt_tokens)
+    #print(new_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['prompt_tokens'])
+    #print()
+    #print(previous_completion_tokens)
+    #print(completion_tokens)
+    #print(new_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['completion_tokens'])
