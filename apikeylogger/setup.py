@@ -19,7 +19,7 @@ setuptools.setup(
     packages = setuptools.find_packages(),
     include_package_data = True,
     classifiers = [],
-    python_requires = "> = 3.6",
+    python_requires = ">=3.6",
     #install_requires = required,
     install_requires = [
         "openai >= 1.6.0",
