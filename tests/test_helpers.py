@@ -14,15 +14,12 @@ def assert_logs_update(OPENAI_ORG_ID, OPENAI_API_KEY, model, prompt_tokens, comp
     :param completion_tokens: The number of completion tokens used for the request
     :param old_logs: The logs before the request was made
     """
-        
+    
     previous_prompt_tokens = old_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['prompt_tokens']
     previous_completion_tokens = old_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['completion_tokens']
     
     with open("logs.json", "r") as file:
         new_logs = json.load(file)
-    
-    assert previous_prompt_tokens + prompt_tokens == new_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['prompt_tokens']
-    assert previous_completion_tokens + completion_tokens == new_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['completion_tokens']
     
     #print(previous_prompt_tokens)
     #print(prompt_tokens)
@@ -31,3 +28,7 @@ def assert_logs_update(OPENAI_ORG_ID, OPENAI_API_KEY, model, prompt_tokens, comp
     #print(previous_completion_tokens)
     #print(completion_tokens)
     #print(new_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['completion_tokens'])
+    
+    assert previous_prompt_tokens + prompt_tokens == new_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['prompt_tokens']
+    assert previous_completion_tokens + completion_tokens == new_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['completion_tokens']
+    

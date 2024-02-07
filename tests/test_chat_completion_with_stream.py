@@ -1,4 +1,4 @@
-from assertions import assert_logs_update
+from tests.test_helpers import assert_logs_update
 from dotenv import load_dotenv
 from openai import OpenAI
 import json

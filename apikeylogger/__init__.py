@@ -39,9 +39,3 @@ def decorate_openai():
 
         print("OpenAI not installed. Please install it with 'pip install openai'")
         
-
-
-# Usage:
-
-# import keylogger
-# keylogger.decorate_openai()
