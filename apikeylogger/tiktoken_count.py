@@ -50,7 +50,9 @@ def num_tokens_from_string(string:str, model:str) -> int:
         encoding = tiktoken.encoding_for_model(model).name
     except:
         encoding = 'cl100k_base'
-    encoding = tiktoken.get_encoding(encoding)
-    num_tokens = len(encoding.encode(string))
-    return num_tokens
-
+    try:
+        encoding = tiktoken.get_encoding(encoding)
+        num_tokens = len(encoding.encode(string))
+        return num_tokens
+    except:
+        return 0

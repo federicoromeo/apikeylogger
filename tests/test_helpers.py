@@ -15,20 +15,23 @@ def assert_logs_update(OPENAI_ORG_ID, OPENAI_API_KEY, model, prompt_tokens, comp
     :param old_logs: The logs before the request was made
     """
     
-    previous_prompt_tokens = old_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['prompt_tokens']
-    previous_completion_tokens = old_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['completion_tokens']
-    
-    with open("logs.json", "r") as file:
+    try:
+        if old_logs == {}:
+            previous_prompt_tokens = 0
+            previous_completion_tokens = 0
+        else:
+            previous_prompt_tokens = old_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['prompt_tokens']
+            previous_completion_tokens = old_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['completion_tokens']
+    except Exception as e:
+        print("Exception in assert_logs_update():",e)
+        previous_prompt_tokens = 0
+        previous_completion_tokens = 0
+        
+    with open("apikeylogs.json", "r") as file:
         new_logs = json.load(file)
     
-    #print(previous_prompt_tokens)
-    #print(prompt_tokens)
-    #print(new_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['prompt_tokens'])
-    #print()
-    #print(previous_completion_tokens)
-    #print(completion_tokens)
-    #print(new_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['completion_tokens'])
+    #print(f"{previous_prompt_tokens} + {prompt_tokens} =? {new_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['prompt_tokens']}")
+    #print(f"{previous_completion_tokens} + {completion_tokens} =? {new_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['completion_tokens']}")
     
     assert previous_prompt_tokens + prompt_tokens == new_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['prompt_tokens']
     assert previous_completion_tokens + completion_tokens == new_logs[OPENAI_ORG_ID][OPENAI_API_KEY][model]['completion_tokens']
-    

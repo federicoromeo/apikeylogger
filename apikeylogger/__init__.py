@@ -3,9 +3,9 @@ from .decorators import chat_completion_decorator
 from .decorators import client_decorator
 
 
-def decorate_openai():
+def track_openai():
     """
-    The function `decorate_openai` decorates the OpenAI client to add
+    The function `track_openai` decorates the OpenAI client to add
     additional functionalities.
     """
     
@@ -30,7 +30,6 @@ def decorate_openai():
             self.chat.completions.create = chat_completion_decorator(self.chat.completions.create)
         
         openai.OpenAI.__init__ = new_init
-        
         
         # Force parameter organization to be specified, either as argument or as env variable
         openai.OpenAI.__init__ = client_decorator(openai.OpenAI.__init__)

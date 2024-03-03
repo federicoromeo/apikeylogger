@@ -1,6 +1,6 @@
 import os
 import json
-import logging
+from .pricing import get_pricing
 from .tiktoken_count import num_tokens_from_string, num_tokens_from_messages
 
 
@@ -15,7 +15,7 @@ def client_decorator(func):
     
     def wrapper(*args, **kwargs):
         
-        logging.warning(" Decorating the client")
+        #logging.warning(" Decorating the client")
 
         if 'organization' not in kwargs.keys():
             if not 'OPENAI_ORG_ID' in os.environ.keys():
@@ -40,7 +40,7 @@ def chat_completion_raw_response_decorator(func):
     
     def wrapper(*args, **kwargs):
         
-        logging.warning(" Decorating the chat completion function for the raw response")
+        #logging.warning(" Decorating the chat completion function for the raw response")
 
         def get_model(args, kwargs):
             if 'model' in kwargs.keys():
@@ -52,13 +52,13 @@ def chat_completion_raw_response_decorator(func):
                 raise Exception("No model specified")
         
         def get_logger_dict():
-            if os.path.exists('logs.json'):
-                with open('logs.json', 'r') as f:
+            if os.path.exists('apikeylogs.json'):
+                with open('apikeylogs.json', 'r') as f:
                     d = json.load(f)
                 return d
             return {}
         
-        def log_tokens(model, prompt_tokens, completion_tokens):
+        def log_tokens(model, prompt_tokens, completion_tokens, prompt_price, completion_price):
 
             log_dict = get_logger_dict()           
 
@@ -67,36 +67,42 @@ def chat_completion_raw_response_decorator(func):
 
             # Create the nested dictionary structure
             log_dict.setdefault(organization_id, {}).setdefault(api_key, {}).setdefault(model, {}).setdefault('prompt_tokens', 0)
+            log_dict.setdefault(organization_id, {}).setdefault(api_key, {}).setdefault(model, {}).setdefault('prompt_price', 0)
             log_dict.setdefault(organization_id, {}).setdefault(api_key, {}).setdefault(model, {}).setdefault('completion_tokens', 0)
-
-            # Update token counts
+            log_dict.setdefault(organization_id, {}).setdefault(api_key, {}).setdefault(model, {}).setdefault('completion_price', 0)
+            
+            # Update token counts and price
             log_dict[organization_id][api_key][model]['prompt_tokens'] += prompt_tokens
+            log_dict[organization_id][api_key][model]['prompt_price'] += prompt_price        
             log_dict[organization_id][api_key][model]['completion_tokens'] += completion_tokens
+            log_dict[organization_id][api_key][model]['completion_price'] += completion_price
 
-            with open('logs.json', 'w') as f:
+            with open('apikeylogs.json', 'w') as f:
                 json.dump(log_dict, f)
-        
-            print()
-            print(log_dict)
-        
+                
         response = func(*args, **kwargs)
         
         # Get the tokens from the response
         response_copy = json.loads(response.text)
-        completion_tokens = response_copy['usage']['completion_tokens']
         prompt_tokens = response_copy['usage']['prompt_tokens']
+        completion_tokens = response_copy['usage']['completion_tokens']
         
         # Get the model used for the request
         model = get_model(args, kwargs)
+        # Calculate the price based on the used model and tokens
+        prompt_price, completion_price = get_pricing(model, prompt_tokens, completion_tokens)
         
-        log_tokens(model, prompt_tokens, completion_tokens)
+        log_tokens(model, prompt_tokens, completion_tokens, prompt_price, completion_price)
 
         return response
     
     return wrapper
 
 
-def chat_completion_decorator(func):
+from openai.types.chat.chat_completion_chunk import ChatCompletionChunk
+from openai._streaming import Stream
+
+def chat_completion_decorator(func) -> Stream[ChatCompletionChunk]:
     """
     Decorator that logs the tokens used for the request and the response
     
@@ -105,9 +111,9 @@ def chat_completion_decorator(func):
     :return: The decorated function
     """
     
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Stream[ChatCompletionChunk]:
         
-        logging.warning(" Decorating the chat completion function")
+        #logging.warning(" Decorating the chat completion function")
 
         def get_model(args, kwargs):
             if 'model' in kwargs.keys():
@@ -119,37 +125,40 @@ def chat_completion_decorator(func):
                 raise Exception("No model specified")
         
         def get_logger_dict():
-            if os.path.exists('logs.json'):
-                with open('logs.json', 'r') as f:
+            if os.path.exists('apikeylogs.json'):
+                with open('apikeylogs.json', 'r') as f:
                     d = json.load(f)
                 return d
             return {}
         
-        def log_tokens(model, prompt_tokens, completion_tokens):
+        def log_tokens(model, prompt_tokens, completion_tokens, prompt_price, completion_price):
 
             log_dict = get_logger_dict()           
 
             organization_id = os.environ.get('OPENAI_ORG_ID')
             api_key = os.environ.get('OPENAI_API_KEY')
 
-            # Create the nested dictionary structure
+           # Create the nested dictionary structure
             log_dict.setdefault(organization_id, {}).setdefault(api_key, {}).setdefault(model, {}).setdefault('prompt_tokens', 0)
+            log_dict.setdefault(organization_id, {}).setdefault(api_key, {}).setdefault(model, {}).setdefault('prompt_price', 0)
             log_dict.setdefault(organization_id, {}).setdefault(api_key, {}).setdefault(model, {}).setdefault('completion_tokens', 0)
-
-            # Update token counts
+            log_dict.setdefault(organization_id, {}).setdefault(api_key, {}).setdefault(model, {}).setdefault('completion_price', 0)
+            
+            # Update token counts and price
             log_dict[organization_id][api_key][model]['prompt_tokens'] += prompt_tokens
+            log_dict[organization_id][api_key][model]['prompt_price'] += prompt_price        
             log_dict[organization_id][api_key][model]['completion_tokens'] += completion_tokens
+            log_dict[organization_id][api_key][model]['completion_price'] += completion_price
 
-            with open('logs.json', 'w') as f:
+            with open('apikeylogs.json', 'w') as f:
                 json.dump(log_dict, f)
-        
-            print()
-            print(log_dict)
-        
+                
         response = func(*args, **kwargs)
+
+        # Get the model used for the request
+        model = get_model(args, kwargs)
         
         if "stream" in kwargs.keys() and kwargs["stream"] == True:
-                                
             
             if not "messages" in kwargs.keys():
                 if len(args) > 0:
@@ -161,19 +170,28 @@ def chat_completion_decorator(func):
                 messages = kwargs["messages"]
             
             prompt_tokens = num_tokens_from_messages(messages, model)
-
-            completion_tokens = num_tokens_from_string(response.choices[0].message.content, model)
-
+            
+            resp = ""
+            chunk_list = []
+            for chunk in response:
+                chunk_list.append(chunk)
+                if chunk.choices[0].delta.content:
+                    resp += chunk.choices[0].delta.content
+            # Reinsert the response back into the response object
+            response.response = chunk_list
+            
+            completion_tokens = num_tokens_from_string(resp, model)
+            
         else:
         
             # Get the tokens from the response
             completion_tokens = response.usage.completion_tokens
             prompt_tokens = response.usage.prompt_tokens
         
-        # Get the model used for the request
-        model = get_model(args, kwargs)
+        # Calculate the price based on the used model and tokens
+        prompt_price, completion_price = get_pricing(model, prompt_tokens, completion_tokens)
         
-        log_tokens(model, prompt_tokens, completion_tokens)
+        log_tokens(model, prompt_tokens, completion_tokens, prompt_price, completion_price)
 
         return response
     
