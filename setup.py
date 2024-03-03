@@ -6,7 +6,7 @@ with open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 
 setuptools.setup(
     name = "apikeylogger",
-    version = "1.1.0",
+    version = "1.1.1",
     author = "Federico Romeo",
     author_email = "federico.romeo.98@gmail.com",
     description = "This library allows you to log the OpenAI api usage *by key* without having to change your code",

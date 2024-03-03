@@ -1,3 +1,18 @@
+Metadata-Version: 2.1
+Name: apikeylogger
+Version: 1.1.0
+Summary: This library allows you to log the OpenAI api usage *by key* without having to change your code
+Home-page: https://github.com/federicoromeo/apikeylogger
+Author: Federico Romeo
+Author-email: federico.romeo.98@gmail.com
+License: MIT
+Project-URL: Source, https://github.com/federicoromeo/apikeylogger
+Keywords: openai,apikey,api,logger,tracker
+Platform: UNKNOWN
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
 # apikeylogger
 
 Track your *OpenAI* api usage **by key**, without any code change.
@@ -36,10 +51,8 @@ response = client.chat.completions.create(
             "content": "What is the meaning of life?",
         }
     ],
-    model = "gpt-3.5-turbo-0125" # any openai model
+    model = "gpt-3.5-turbo-16k" # any model
 )
-
-print(response.choices[0].message.content)
 ```
 
 #### Test
@@ -48,3 +61,5 @@ Run tests with:
 ```bash
 pytest
 ```
+
+
