@@ -1,7 +1,7 @@
 import os
 import setuptools
 
-with open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'README.md'), 'r') as f:
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'README.md'), 'r') as f:
     long_description = f.read()
 
 setuptools.setup(
