@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: apikeylogger
-Version: 1.1.0
+Version: 1.1.1
 Summary: This library allows you to log the OpenAI api usage *by key* without having to change your code
 Home-page: https://github.com/federicoromeo/apikeylogger
 Author: Federico Romeo
@@ -51,8 +51,10 @@ response = client.chat.completions.create(
             "content": "What is the meaning of life?",
         }
     ],
-    model = "gpt-3.5-turbo-16k" # any model
+    model = "gpt-3.5-turbo-0125" # any openai model
 )
+
+print(response.choices[0].message.content)
 ```
 
 #### Test
